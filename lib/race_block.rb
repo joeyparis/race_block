@@ -46,10 +46,10 @@ module RaceBlock
     RaceBlock.client.expire(@key, 10) if RaceBlock.client.ttl(@key) == -1
 
     if !RaceBlock.client.get(@key)
-      sleep rand(0.0..sleep_delay) if desync_tokens && ENV['RACK_ENV'] == 'test'
+      sleep rand(0.0..sleep_delay) if desync_tokens && ENV["RACK_ENV"] == "test"
       token = SecureRandom.hex
       RaceBlock.client.set(@key, token)
-      RaceBlock.client.expire(@key, [15,sleep_delay].max)
+      RaceBlock.client.expire(@key, [15, sleep_delay].max)
       sleep sleep_delay
       # Okay, so I feel like this is pseudo science, but whatever. Our
       # race condition comes from when the same cron job is called by
@@ -70,7 +70,7 @@ module RaceBlock
 
         # I have lots of internal debates on whether I should full
         # delete the key here or still let it sit for a few seconds
-        RaceBlock.client.expire(@key, desync_tokens && ENV['RACK_ENV'] == 'test' ? 10 : 3)
+        RaceBlock.client.expire(@key, desync_tokens && ENV["RACK_ENV"] == "test" ? 10 : 3)
 
         RaceBlock.client.del(@key) if expire_immediately
 

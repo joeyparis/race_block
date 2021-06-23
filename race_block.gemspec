@@ -8,17 +8,16 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Joey Paris"]
   spec.email         = ["joey@leadjig.com"]
 
-  # spec.summary       = "TODO: Write a short summary, because RubyGems requires one."
-  spec.summary = "Yes"
+  spec.summary       = "A Ruby code block wrapper to help prevent race conditions across multiple threads and even separate servers."
   # spec.description   = "TODO: Write a longer description or delete this line."
-  # spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = "https://github.com/joeyparis/race_block"
   spec.license = "MIT"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.7.0")
 
   spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
 
-  # spec.metadata["homepage_uri"] = spec.homepage
-  # spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."
+  spec.metadata["homepage_uri"] = spec.homepage
+  spec.metadata["source_code_uri"] = "https://github.com/joeyparis/race_block"
   # spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
 
   # Specify which files should be added to the gem when it is released.
@@ -32,6 +31,12 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "redis", "4.0.1"
+
+  spec.add_development_dependency "rake", "13.0"
+  spec.add_development_dependency "rspec", "3.10"
+  spec.add_development_dependency "rubocop", "1.17"
+  spec.add_development_dependency "simplecov", "0.21.2"
+  spec.add_development_dependency "thwait", "0.2.0"
 
   # For more information and examples about making a new gem, checkout our
   # guide at: https://bundler.io/guides/creating_gem.html
