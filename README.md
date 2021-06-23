@@ -1,5 +1,7 @@
 # RaceBlock
 
+[![Ruby](https://github.com/joeyparis/race_block/actions/workflows/main.yml/badge.svg)](https://github.com/joeyparis/race_block/actions/workflows/main.yml)
+
 A Ruby code block wrapper to help prevent race conditions across multiple threads and even separate servers.
 
 **Disclaimer** This code has been used in production for several years now without incident, but I make no guarantee about the thread-safeness it has. Use at your own risk.
