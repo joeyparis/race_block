@@ -9,11 +9,11 @@ Gem::Specification.new do |spec|
   spec.email         = ["joey@leadjig.com"]
 
   # spec.summary       = "TODO: Write a short summary, because RubyGems requires one."
-  spec.summary = 'Yes'
+  spec.summary = "Yes"
   # spec.description   = "TODO: Write a longer description or delete this line."
   # spec.homepage      = "TODO: Put your gem's website or public repo URL here."
-  spec.license       = "MIT"
-  spec.required_ruby_version = Gem::Requirement.new(">= 2.4.0")
+  spec.license = "MIT"
+  spec.required_ruby_version = Gem::Requirement.new(">= 2.7.0")
 
   spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
 

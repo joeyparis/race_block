@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'thwait'
+require "thwait"
 
 RSpec::Matchers.define :one_of do |arr|
   match { |actual| arr.include?(actual) }
@@ -11,9 +11,8 @@ end
 # end
 
 RSpec.describe RaceBlock do
-
   before do
-    ENV['RACK_ENV'] = 'test'
+    ENV["RACK_ENV"] = "test"
   end
 
   before(:each) do |example|
@@ -29,27 +28,27 @@ RSpec.describe RaceBlock do
   end
 
   it "pings redis" do
-    expect(RaceBlock.client.ping).to eq('PONG')
+    expect(RaceBlock.client.ping).to eq("PONG")
   end
 
   it "writes to redis" do
     time = Time.now.to_s
-    expect(RaceBlock.client.set('writes to redis', time)).to eq('OK')
+    expect(RaceBlock.client.set("writes to redis", time)).to eq("OK")
   end
 
   it "handles a failed redis connection", reload: true do
     expect(RaceBlock.logger).to receive(:error)
-    ENV['REDIS_HOST'] = 'google.com'
-    RaceBlock.client(true)
+    ENV["REDIS_HOST"] = "google.com"
+    RaceBlock.client(reload: true)
     # Reset so redis is working again
-    ENV['REDIS_HOST'] = nil
-    RaceBlock.client(true)
+    ENV["REDIS_HOST"] = nil
+    RaceBlock.client(reload: true)
   end
 
   it "reads what it wrote from redis" do
     time = Time.now.to_s
     RaceBlock.client.set("reads what it wrote from redis", time)
-    expect(RaceBlock.client.get("reads what it wrote from redis")).to eq (time)
+    expect(RaceBlock.client.get("reads what it wrote from redis")).to eq(time)
   end
 
   it "has a consistent key" do
@@ -58,11 +57,11 @@ RSpec.describe RaceBlock do
   end
 
   it "fails if no key is provided" do
-    expect { RaceBlock.start('') }.to raise_error('A key must be provided to start a RaceBlock')
+    expect { RaceBlock.start("") }.to raise_error("A key must be provided to start a RaceBlock")
   end
 
   it "returns it's yield and expire immediately" do
-    returned_value = RaceBlock.start(@key, {expire_immediately: true}) do
+    returned_value = RaceBlock.start(@key, { expire_immediately: true }) do
       "yield_returned"
     end
 
@@ -72,8 +71,9 @@ RSpec.describe RaceBlock do
   it "only runs once" do
     dbl = double("dbl")
     expect(dbl).to receive(:log).once
-    expect(RaceBlock.logger).to receive(:info).with('Running block').once
-    expect(RaceBlock.logger).to receive(:info).with(one_of(['Token already exists', 'Token out of sync'])).exactly(2).times
+    expect(RaceBlock.logger).to receive(:info).with("Running block").once
+    expect(RaceBlock.logger).to receive(:info).with(one_of(["Token already exists",
+                                                            "Token out of sync"])).exactly(2).times
     threads = (0..2).map do
       Thread.start do
         RaceBlock.start(@key, debug: true) do
@@ -87,9 +87,9 @@ RSpec.describe RaceBlock do
   it "doesn't always run the first call" do
     dbl = double("dbl")
     expect(dbl).to receive(:log).once
-    allow(RaceBlock.logger).to receive(:info).with('Token already exists')
-    expect(RaceBlock.logger).to receive(:info).with('Running block').once
-    expect(RaceBlock.logger).to receive(:info).with('Token out of sync').at_least(1).times
+    allow(RaceBlock.logger).to receive(:info).with("Token already exists")
+    expect(RaceBlock.logger).to receive(:info).with("Running block").once
+    expect(RaceBlock.logger).to receive(:info).with("Token out of sync").at_least(1).times
     threads = (0..99).map do
       Thread.start do
         RaceBlock.start(@key, debug: true, desync_tokens: true) do
@@ -99,5 +99,4 @@ RSpec.describe RaceBlock do
     end
     ThreadsWait.all_waits threads
   end
-
 end
