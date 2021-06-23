@@ -61,7 +61,7 @@ RSpec.describe RaceBlock do
   end
 
   it "returns it's yield and expire immediately" do
-    returned_value = RaceBlock.start(@key, { expire_immediately: true }) do
+    returned_value = RaceBlock.start(@key, **{ expire_immediately: true }) do
       "yield_returned"
     end
 
@@ -76,7 +76,7 @@ RSpec.describe RaceBlock do
                                                             "Token out of sync"])).exactly(2).times
     threads = (0..2).map do
       Thread.start do
-        RaceBlock.start(@key, debug: true) do
+        RaceBlock.start(@key, **{ debug: true }) do
           dbl.log
         end
       end
@@ -92,7 +92,7 @@ RSpec.describe RaceBlock do
     expect(RaceBlock.logger).to receive(:info).with("Token out of sync").at_least(1).times
     threads = (0..99).map do
       Thread.start do
-        RaceBlock.start(@key, debug: true, desync_tokens: true) do
+        RaceBlock.start(@key, **{ debug: true, desync_tokens: true }) do
           dbl.log
         end
       end
