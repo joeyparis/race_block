@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary       = "A Ruby code block wrapper to help prevent race conditions " \
                        "across multiple threads and even separate servers."
   # spec.description   = "TODO: Write a longer description or delete this line."
-  spec.homepage      = "https://github.com/joeyparis/race_block"
+  spec.homepage      = "https://rubygems.org/gems/race_block"
   spec.license = "MIT"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.5.0")
 

@@ -1,5 +1,6 @@
 # RaceBlock
 
+[![Gem Version](https://badge.fury.io/rb/race_block.svg)](https://badge.fury.io/rb/race_block)
 [![Ruby](https://github.com/joeyparis/race_block/actions/workflows/main.yml/badge.svg)](https://github.com/joeyparis/race_block/actions/workflows/main.yml)
 
 A Ruby code block wrapper to help prevent race conditions across multiple threads and even separate servers.
