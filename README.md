@@ -2,6 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/race_block.svg)](https://badge.fury.io/rb/race_block)
 [![Ruby](https://github.com/joeyparis/race_block/actions/workflows/main.yml/badge.svg)](https://github.com/joeyparis/race_block/actions/workflows/main.yml)
+![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/joeyparis/22954a8941d89a10237b7839e57267ec/raw/coverage.json)
 
 A Ruby code block wrapper to help prevent race conditions across multiple threads and even separate servers.
 
