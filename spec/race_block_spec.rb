@@ -13,6 +13,9 @@ end
 RSpec.describe RaceBlock do
   before do
     ENV["RACK_ENV"] = "test"
+    RaceBlock.config do |c|
+      c.redis = Redis.new
+    end
   end
 
   before(:each) do |example|
@@ -36,17 +39,13 @@ RSpec.describe RaceBlock do
     expect(RaceBlock.client.set("writes to redis", time)).to eq("OK")
   end
 
-  it "handles a failed redis connection", reload: true do
-    expect(RaceBlock.logger).to receive(:error)
+  it "raises an error for a bad redis connection", reload: true do
     RaceBlock.config do |c|
-      c.redis_host = "google.com"
-      c.redis_timeout = 1
+      c.redis = Redis.new(host: "google.com", timeout: 1)
     end
-    RaceBlock.client(reload: true)
+    expect { RaceBlock.start(@key) }.to raise_error(Redis::CannotConnectError)
     # Reset so redis is working again
-    RaceBlock.config.redis_host = nil
-    RaceBlock.config.redis_timeout = 10
-    RaceBlock.client(reload: true)
+    RaceBlock.config.redis = Redis.new
   end
 
   it "reads what it wrote from redis" do

@@ -11,12 +11,10 @@ module RaceBlock
 
   # For managing Raceblock current configuration settings
   class Configuration
-    attr_accessor :redis_host, :redis_port, :redis_timeout
+    attr_accessor :redis
 
     def initialize
-      @redis_host = ENV["REDIS_HOST"]
-      @redis_port = ENV["REDIS_PORT"]
-      @timeout = ENV["REDIS_TIMEOUT"]
+      @redis = Redis.new
     end
   end
 
@@ -30,17 +28,8 @@ module RaceBlock
     configuration
   end
 
-  def self.client(reload: false)
-    if @redis.nil? || reload
-      @redis = Redis.new(host: config.redis_host, port: config.redis_port, timeout: config.redis_timeout)
-
-      begin
-        @redis.ping
-      rescue Redis::CannotConnectError => e
-        RaceBlock.logger.error e
-      end
-    end
-    @redis
+  def self.client
+    config.redis
   end
 
   def self.logger
@@ -55,24 +44,11 @@ module RaceBlock
     RaceBlock.client.del(RaceBlock.key(key))
   end
 
-  def self.start(key, sleep_delay: 0.5, expire: 60, expiration_delay: 3, desync_tokens: 0)
-    raise("A key must be provided to start a RaceBlock") if key.empty?
-
-    @key = RaceBlock.key(key)
-
-    # Set an expiration for the token if the key is defined but doesn't
-    # have an expiration set (happens sometimes if a thread dies early).
-    # `-1` means the key is set but does not expire, `-2` means the key is
-    # not set
-    RaceBlock.client.expire(@key, 10) if RaceBlock.client.ttl(@key) == -1
-
-    # Token already exists
-    return logger.debug("Token already exists") if RaceBlock.client.get(@key)
-
+  def self.set_token_and_wait(key, sleep_delay: 0.5, desync_tokens: 0)
     sleep desync_tokens
     token = SecureRandom.hex
-    RaceBlock.client.set(@key, token)
-    RaceBlock.client.expire(@key, (sleep_delay + 15).round)
+    RaceBlock.client.set(key, token)
+    RaceBlock.client.expire(key, (sleep_delay + 15).round)
     sleep sleep_delay
     # Okay, so I feel like this is pseudo science, but whatever. Our
     # race condition comes from when the same cron job is called by
@@ -86,8 +62,28 @@ module RaceBlock
     # moment, and I also believe this is what is keep the EmailQueue
     # stable which seems to have no duplicate sending problems.
 
+    return true if RaceBlock.client.get(@key) == token
+
     # Token out of sync
-    return logger.debug("Token out of sync") unless RaceBlock.client.get(@key) == token
+    logger.debug("Token out of sync")
+    false
+  end
+
+  def self.start(key, expire: 60, expiration_delay: 3, **args)
+    raise("A key must be provided to start a RaceBlock") if key.empty?
+
+    @key = RaceBlock.key(key)
+
+    # Set an expiration for the token if the key is defined but doesn't
+    # have an expiration set (happens sometimes if a thread dies early).
+    # `-1` means the key is set but does not expire, `-2` means the key is
+    # not set
+    RaceBlock.client.expire(@key, 10) if RaceBlock.client.ttl(@key) == -1
+
+    # Token already exists
+    return logger.debug("Token already exists") if RaceBlock.client.get(@key)
+
+    return unless set_token_and_wait(@key, args)
 
     RaceBlock.client.expire(@key, expire)
     logger.debug("Running block")
