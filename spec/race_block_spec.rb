@@ -61,7 +61,7 @@ RSpec.describe RaceBlock do
   end
 
   it "returns it's yield and expire immediately" do
-    returned_value = RaceBlock.start(@key, **{ expire_immediately: true }) do
+    returned_value = RaceBlock.start(@key, **{ expiration_delay: 0 }) do
       "yield_returned"
     end
 
@@ -90,13 +90,15 @@ RSpec.describe RaceBlock do
     allow(RaceBlock.logger).to receive(:info).with("Token already exists")
     expect(RaceBlock.logger).to receive(:info).with("Running block").once
     expect(RaceBlock.logger).to receive(:info).with("Token out of sync").at_least(1).times
+    ENV["DESYNC_TOKENS"] = "true"
     threads = (0..99).map do
       Thread.start do
-        RaceBlock.start(@key, **{ debug: true, desync_tokens: true }) do
-          dbl.log
-        end
+        RaceBlock.start(@key, **{ debug: true, expiration_delay: 10 }) { dbl.log }
       end
     end
     ThreadsWait.all_waits threads
+    ENV.delete("DESYNC_TOKENS")
   end
+
+  # TODO: Add test to make sure token expires if something goes wrong
 end
