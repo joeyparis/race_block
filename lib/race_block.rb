@@ -34,8 +34,8 @@ module RaceBlock
     RaceBlock.client.del(RaceBlock.key(key))
   end
 
-  def self.start(key, sleep_delay: 0.5, expire: 60, expiration_delay: 3, debug: false)
-    raise("A key must be provided to start a RaceBlock") if key.nil? || key.empty?
+  def self.start(key, sleep_delay: 0.5, expire: 60, expiration_delay: 3, desync_tokens: 0)
+    raise("A key must be provided to start a RaceBlock") if key.empty?
 
     @key = RaceBlock.key(key)
 
@@ -45,41 +45,38 @@ module RaceBlock
     # not set
     RaceBlock.client.expire(@key, 10) if RaceBlock.client.ttl(@key) == -1
 
-    if !RaceBlock.client.get(@key)
-      sleep rand(0.0..sleep_delay) if ENV["DESYNC_TOKENS"]
-      token = SecureRandom.hex
-      RaceBlock.client.set(@key, token)
-      RaceBlock.client.expire(@key, [15, sleep_delay].max)
-      sleep sleep_delay
-      # Okay, so I feel like this is pseudo science, but whatever. Our
-      # race condition comes from when the same cron job is called by
-      # several different server instances at the same time
-      # (theoretically) all within the same second (much less really).
-      # By waiting a second we can let all the same cron jobs that were
-      # called at roughly the exact same time finish their write to the
-      # redis cache so that by the time the sleep is over, only one
-      # token is still accurate. I'm hesitant to believe this actually
-      # works, but I can't find any flaws in the logic at the current
-      # moment, and I also believe this is what is keep the EmailQueue
-      # stable which seems to have no duplicate sending problems.
-      if RaceBlock.client.get(@key) == token
-        RaceBlock.client.expire(@key, expire)
-        logger.info("Running block") if debug
-
-        r = yield
-
-        # I have lots of internal debates on whether I should full
-        # delete the key here or still let it sit for a few seconds
-        RaceBlock.client.expire(@key, expiration_delay)
-        
-        r
-      elsif debug
-        logger.info("Token out of sync")
-      end
-    # Token out of sync
-    elsif debug
-      logger.info("Token already exists")
-    end
     # Token already exists
+    return logger.debug("Token already exists") if RaceBlock.client.get(@key)
+
+    sleep desync_tokens
+    token = SecureRandom.hex
+    RaceBlock.client.set(@key, token)
+    RaceBlock.client.expire(@key, (sleep_delay + 15).round)
+    sleep sleep_delay
+    # Okay, so I feel like this is pseudo science, but whatever. Our
+    # race condition comes from when the same cron job is called by
+    # several different server instances at the same time
+    # (theoretically) all within the same second (much less really).
+    # By waiting a second we can let all the same cron jobs that were
+    # called at roughly the exact same time finish their write to the
+    # redis cache so that by the time the sleep is over, only one
+    # token is still accurate. I'm hesitant to believe this actually
+    # works, but I can't find any flaws in the logic at the current
+    # moment, and I also believe this is what is keep the EmailQueue
+    # stable which seems to have no duplicate sending problems.
+
+    # Token out of sync
+    return logger.debug("Token out of sync") unless RaceBlock.client.get(@key) == token
+
+    RaceBlock.client.expire(@key, expire)
+    logger.debug("Running block")
+
+    r = yield
+
+    # I have lots of internal debates on whether I should full
+    # delete the key here or still let it sit for a few seconds
+    RaceBlock.client.expire(@key, expiration_delay)
+
+    r
   end
 end
