@@ -77,9 +77,9 @@ RSpec.describe RaceBlock do
                                                              "Token out of sync"])).exactly(2).times
     threads = (0..2).map do
       Thread.start do
-        puts (RaceBlock.start(@key) do
+        RaceBlock.start(@key) do
           dbl.log
-        end)
+        end
       end
     end
     ThreadsWait.all_waits threads
