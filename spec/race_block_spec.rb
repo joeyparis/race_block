@@ -38,10 +38,14 @@ RSpec.describe RaceBlock do
 
   it "handles a failed redis connection", reload: true do
     expect(RaceBlock.logger).to receive(:error)
-    ENV["REDIS_HOST"] = "google.com"
+    RaceBlock.config do |c|
+      c.redis_host = "google.com"
+      c.redis_timeout = 1
+    end
     RaceBlock.client(reload: true)
     # Reset so redis is working again
-    ENV["REDIS_HOST"] = nil
+    RaceBlock.config.redis_host = nil
+    RaceBlock.config.redis_timeout = 10
     RaceBlock.client(reload: true)
   end
 
@@ -94,7 +98,7 @@ RSpec.describe RaceBlock do
     # ENV["DESYNC_TOKENS"] = "true"
     threads = (0..99).map do
       Thread.start do
-        RaceBlock.start(@key, **{ sleep_delay: 5, expiration_delay: 10, desync_tokens: rand(0.0..5) }) { dbl.log }
+        RaceBlock.start(@key, **{ sleep_delay: 3, expiration_delay: 10, desync_tokens: rand(0.0..3) }) { dbl.log }
       end
     end
     ThreadsWait.all_waits threads

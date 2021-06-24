@@ -9,9 +9,30 @@ require_relative "race_block/version"
 module RaceBlock
   class Error < StandardError; end
 
+  # For managing Raceblock current configuration settings
+  class Configuration
+    attr_accessor :redis_host, :redis_port, :redis_timeout
+
+    def initialize
+      @redis_host = ENV["REDIS_HOST"]
+      @redis_port = ENV["REDIS_PORT"]
+      @timeout = ENV["REDIS_TIMEOUT"]
+    end
+  end
+
+  class << self
+    attr_accessor :configuration
+  end
+
+  def self.config
+    self.configuration ||= Configuration.new
+    yield(configuration) if block_given?
+    configuration
+  end
+
   def self.client(reload: false)
     if @redis.nil? || reload
-      @redis = Redis.new(host: ENV["REDIS_HOST"], port: ENV["REDIS_PORT"])
+      @redis = Redis.new(host: config.redis_host, port: config.redis_port, timeout: config.redis_timeout)
 
       begin
         @redis.ping
