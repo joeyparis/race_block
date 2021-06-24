@@ -36,7 +36,7 @@ RSpec.describe RaceBlock do
     expect(RaceBlock.client.set("writes to redis", time)).to eq("OK")
   end
 
-  skip "handles a failed redis connection", reload: true do
+  it "handles a failed redis connection", reload: true do
     expect(RaceBlock.logger).to receive(:error)
     ENV["REDIS_HOST"] = "google.com"
     RaceBlock.client(reload: true)
