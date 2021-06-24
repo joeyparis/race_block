@@ -83,7 +83,7 @@ module RaceBlock
     # Token already exists
     return logger.debug("Token already exists") if RaceBlock.client.get(@key)
 
-    return unless set_token_and_wait(@key, args)
+    return unless set_token_and_wait(@key, **args)
 
     RaceBlock.client.expire(@key, expire)
     logger.debug("Running block")
