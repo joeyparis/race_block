@@ -37,7 +37,7 @@ jobs:
       if: github.ref == 'refs/heads/master'
       uses: schneegans/dynamic-badges-action@v1.1.0
       with:
-        auth: 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 #${{ secrets.GIST_SECRET }}
+        auth: ${{ secrets.GIST_SECRET }}
         gistID: 22954a8941d89a10237b7839e57267ec
         filename: coverage.json
         label: 'Coverage:'
