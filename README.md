@@ -2,7 +2,9 @@
 
 [![Gem Version](https://badge.fury.io/rb/race_block.svg)](https://badge.fury.io/rb/race_block)
 [![Ruby](https://github.com/joeyparis/race_block/actions/workflows/main.yml/badge.svg)](https://github.com/joeyparis/race_block/actions/workflows/main.yml)
-![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/joeyparis/22954a8941d89a10237b7839e57267ec/raw/coverage.json)
+![Master Test Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/joeyparis/22954a8941d89a10237b7839e57267ec/raw/coverage.json)
+[![Develop Test Coverage](https://api.codeclimate.com/v1/badges/dee875117bee3e5a72f7/test_coverage)](https://codeclimate.com/github/joeyparis/race_block/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/dee875117bee3e5a72f7/maintainability)](https://codeclimate.com/github/joeyparis/race_block/maintainability)
 
 A Ruby code block wrapper to help prevent race conditions across multiple threads and even separate servers.
 
