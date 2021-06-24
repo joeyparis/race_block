@@ -6,7 +6,7 @@
 
 A Ruby code block wrapper to help prevent race conditions across multiple threads and even separate servers.
 
-**Disclaimer** This code has been used in production for several years now without incident, but I make no guarantee about the thread-safeness it has. Use at your own risk.
+>**Disclaimer** This code has been used in production for several years now without incident, but I make no guarantee about the thread-safeness it has. Use at your own risk.
 
 ## Concept
 
@@ -31,6 +31,10 @@ And then execute:
 Or install it yourself as:
 
     $ gem install race_block
+    
+## Requirements:
+* Ruby >= 2.5
+* A Redis server
 
 ## Potential Use Cases
 
