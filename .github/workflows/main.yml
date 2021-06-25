@@ -23,18 +23,25 @@ jobs:
       with:
         redis-version: 6.2.4
     - name: Run the default task
+      env:
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       run: |
         gem install bundler -v 2.2.6
         bundle install
         bundle exec rake
+    - name: Send coverage to CodeClimate
+      if: ${{ !env.ACT }}
+      uses: paambaati/codeclimate-action@v2.7.5
+      env:
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     - name: Get coverage
-      if: github.ref == 'refs/heads/master'
+      if: ${{ !env.ACT }} && github.ref == 'refs/heads/master'
       run: echo "COVERAGE=$(cat ./coverage/.last_run.json | jq -r '.result.line')%" >> $GITHUB_ENV
     - name: Testing variables
-      if: github.ref == 'refs/heads/master'
+      if: ${{ !env.ACT }} && github.ref == 'refs/heads/master'
       run: echo '' # This empty step is required for `COVERAGE` to be available in the next step, unusre why
     - name: Create coverage badge
-      if: github.ref == 'refs/heads/master'
+      if: ${{ !env.ACT }} && github.ref == 'refs/heads/master'
       uses: schneegans/dynamic-badges-action@v1.1.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
@@ -43,4 +50,3 @@ jobs:
         label: 'Coverage:'
         message: ${{ env.COVERAGE }}
         color: green
-
