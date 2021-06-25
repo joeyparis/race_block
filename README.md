@@ -47,6 +47,18 @@ The original inspiration behind this gem was running cron jobs across multiple s
 
 ## Usage
 
+Before calling `RaceBlock.start` you'll need to configure your own redis client in `RaceBlock.config`
+
+```ruby
+RaceBlock.config do |config|
+    config.redis = Redis.new
+end
+
+# or...
+
+RaceBlock.config.redis = Redis.new
+```
+
 Any code that you want to be "thread-safe" and ensure is only executing in one location should be placed in a `RaceBlock` with a unique identifying key that will be checked across all instances.
 
 ```ruby
@@ -61,9 +73,19 @@ end
 |------|-------|-----------|
 |sleep_delay|0.5|How many seconds the RaceBlock should wait after generating its unique token before it checks if it can execute the RaceBlock. **Important** This value should be longer than the amount of time it takes your server to write to the Redis database. 0.5 seconds has worked for us, but longer  `sleep_delay` values should technically be safer.|
 |expire|60|How many seconds the key should be stored for while running. This number should be longer than the length of time the RaceBlock will take to execute once it starts. The key will be deleted 3 seconds after the block completes, regardless of the time left from `expire`.|
-|expire_immediately|false|Whether or not the key should expire immediately after block completion, or wait the default 3 seconds.|
-|debug|false|Can help debug why a RaceBlock call is running or not running.|
-|dsync_tokens|false| **TESTING ONLY** This is purely for testing purposes to simulate inconsistent request times. It should never be used in a production environment.|
+|expiration_delay|3|How long after block completion before the key is deleted. Setting to 0 will delete it instanttly upon block completion.|
+|desync_tokens|0| **TESTING ONLY** This is purely for testing purposes to simulate inconsistent request times. It should never be used in a production environment.|
+
+#### Changing default values
+You can change the default values using `RaceBlock.config`, otherwise they can be overridden on a per call basis.
+
+```ruby
+RaceBlock.config do |config|
+    config.sleep_delay = 1.5
+    config.expire = 14
+    config.expiration_delay = 4
+end
+```
 
 ## Development
 
