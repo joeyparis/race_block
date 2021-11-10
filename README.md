@@ -97,6 +97,16 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/joeyparis/race_block. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/joeyparis/race_block/blob/master/CODE_OF_CONDUCT.md).
 
+I am also interested in porting this project to multiple languages and would love help in the languages I am less familiar with.
+
+- [x] Ruby
+- [ ] JavaScript
+- [ ] Python
+- [ ] Go
+- [ ] LolCode
+- [ ] ..?
+
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
