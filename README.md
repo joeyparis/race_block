@@ -62,7 +62,7 @@ RaceBlock.config.redis = Redis.new
 Any code that you want to be "thread-safe" and ensure is only executing in one location should be placed in a `RaceBlock` with a unique identifying key that will be checked across all instances.
 
 ```ruby
-RaceBlock.start('unique_key', {}) do
+RaceBlock.start('unique_key', **kwargs) do
     # Insert code that should only be executed once at a time here...
 end
 ```
