@@ -115,5 +115,18 @@ RSpec.describe RaceBlock do
     ThreadsWait.all_waits threads
   end
 
+  it "handles multiple keys simultaneously" do
+    keys = ('A'..'Z').to_a
+    dbl = double("dbl")
+    expect(dbl).to receive(:log).exactly(keys.length).times
+    expect(RaceBlock.logger).to receive(:debug).with("Running block").exactly(keys.length).times
+    threads = keys.map do |key|
+      Thread.start do
+        RaceBlock.start(key, **{ sleep_delay: 3, expiration_delay: 10, desync_tokens: rand(0.0..3) }) { dbl.log }
+      end
+    end
+    ThreadsWait.all_waits threads
+  end
+
   # TODO: Add test to make sure token expires if something goes wrong
 end
