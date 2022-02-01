@@ -116,7 +116,7 @@ RSpec.describe RaceBlock do
   end
 
   it "handles multiple keys simultaneously" do
-    keys = ('A'..'Z').to_a
+    keys = ("A".."Z").to_a
     dbl = double("dbl")
     expect(dbl).to receive(:log).exactly(keys.length).times
     expect(RaceBlock.logger).to receive(:debug).with("Running block").exactly(keys.length).times
